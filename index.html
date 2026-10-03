@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html lang="ru">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Калькулятор</title>
-    <!-- Подключение Tesseract.js для распознавания текста с фото -->
+    <title>Calculator</title>
+    <!-- Tesseract.js CDN for OCR photo recognition -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
-         :root {
+        :root {
             --bg-color: #17191c;
             --card-bg: #202124;
             --btn-bg: #2f3136;
@@ -21,12 +20,12 @@
             --border: #3c4043;
             --step-bg: #292a2d;
         }
-        
+
         * {
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        
+
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
@@ -34,415 +33,442 @@
             padding: 20px 10px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
         }
-        
+
         .calc-app {
             width: 100%;
             max-width: 480px;
             background: var(--card-bg);
             border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 24px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
             border: 1px solid var(--border);
         }
-        
+
         header h1 {
-            margin: 0 0 15px 0;
-            font-size: 22px;
+            margin: 0 0 18px 0;
+            font-size: 24px;
             font-weight: 500;
             text-align: center;
             color: var(--text-main);
+            letter-spacing: 0.5px;
         }
-        /* Дисплей калькулятора */
-        
+
+        /* Calculator Display */
         .display-container {
             background: #17191c;
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
             text-align: right;
             border: 1px solid var(--border);
         }
-        
+
         .display-expression {
             color: var(--text-sub);
-            font-size: 16px;
+            font-size: 15px;
             min-height: 22px;
             word-wrap: break-word;
+            font-family: monospace;
         }
-        
+
         .display-input {
             width: 100%;
             background: transparent;
             border: none;
-            color: #fff;
+            color: #ffffff;
             font-size: 28px;
             font-weight: bold;
             text-align: right;
             outline: none;
             margin-top: 6px;
+            font-family: monospace;
         }
-        /* Кнопка загрузки фото */
-        
+
+        /* Photo Upload Zone */
         .photo-upload-zone {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             background: #2b2d31;
             border: 1px dashed var(--btn-action);
-            border-radius: 10px;
-            padding: 10px;
+            border-radius: 12px;
+            padding: 12px;
             cursor: pointer;
-            margin-bottom: 16px;
-            transition: 0.2s;
+            margin-bottom: 18px;
+            transition: background 0.2s, border-color 0.2s;
         }
-        
+
         .photo-upload-zone:hover {
             background: #33363d;
+            border-color: #8ab4f8;
         }
-        
+
         .photo-upload-zone input {
             display: none;
         }
-        
+
         .photo-upload-label {
             color: #8ab4f8;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
         }
-        /* Сетка клавиатуры */
-        
+
+        /* Keypad Grid Layout */
         .keypad {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
         }
-        
+
         button.btn {
             background: var(--btn-bg);
             color: var(--text-main);
             border: none;
-            border-radius: 8px;
-            padding: 12px 4px;
+            border-radius: 10px;
+            padding: 14px 4px;
             font-size: 15px;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.15s;
+            transition: background 0.15s, transform 0.05s;
             user-select: none;
         }
-        
+
+        button.btn:active {
+            transform: scale(0.97);
+        }
+
         button.btn:hover {
             background: var(--btn-hover);
         }
-        
+
         button.btn-func {
             background: var(--btn-func-bg);
             color: #e8eaed;
         }
-        
+
         button.btn-equals {
             background: var(--btn-action);
-            color: #fff;
+            color: #ffffff;
             grid-row: span 2;
             height: 100%;
             font-size: 20px;
         }
-        
+
         button.btn-equals:hover {
             background: var(--btn-action-hover);
         }
-        /* Пошаговое решение */
-        
+
+        /* Step-by-step Solution Display */
         .solution-section {
-            margin-top: 20px;
+            margin-top: 22px;
             display: none;
             border-top: 1px solid var(--border);
-            padding-top: 16px;
+            padding-top: 18px;
         }
-        
+
         .solution-section.active {
             display: block;
         }
-        
+
         .solution-section h3 {
-            margin: 0 0 12px 0;
+            margin: 0 0 14px 0;
             font-size: 16px;
             color: #8ab4f8;
+            font-weight: 600;
         }
-        
+
         .step-card {
             background: var(--step-bg);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 8px;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
             font-size: 14px;
-            line-height: 1.4;
+            line-height: 1.5;
+            border: 1px solid #383a3e;
         }
-        
+
         .step-title {
             font-weight: 600;
-            color: #fff;
-            margin-bottom: 4px;
+            color: #ffffff;
+            margin-bottom: 6px;
         }
-        
+
+        .formula-box {
+            font-family: monospace;
+            background: #17191c;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            display: inline-block;
+            margin: 4px 0;
+            color: #8ab4f8;
+        }
+
         .loading-spinner {
             display: none;
             text-align: center;
             color: #8ab4f8;
             font-size: 14px;
-            margin: 10px 0;
+            margin: 12px 0;
+            font-weight: 500;
         }
     </style>
 </head>
-
 <body>
 
-    <div class="calc-app">
-        <header>
-            <h1>Калькулятор</h1>
-        </header>
+<div class="calc-app">
+    <header>
+        <h1>Calculator</h1>
+    </header>
 
-        <!-- Загрузка фото -->
-        <div class="photo-upload-zone" onclick="document.getElementById('photoInput').click()">
-            <span>📷</span>
-            <span class="photo-upload-label">Загрузить фото задачи / формулы</span>
-            <input type="file" id="photoInput" accept="image/*" onchange="processImage(this)">
-        </div>
-
-        <div id="loading" class="loading-spinner">⏳ Сканирование и распознавание текста с фото...</div>
-
-        <!-- Экран -->
-        <div class="display-container">
-            <div id="expressionDisplay" class="display-expression"></div>
-            <input type="text" id="calcInput" class="display-input" placeholder="0" autocomplete="off">
-        </div>
-
-        <!-- Клавиатура (как на фото) -->
-        <div class="keypad">
-            <button class="btn btn-func" onclick="append('!')">x!</button>
-            <button class="btn btn-func" onclick="append('(')">(</button>
-            <button class="btn btn-func" onclick="append(')')">)</button>
-            <button class="btn btn-func" onclick="append('%')">%</button>
-            <button class="btn btn-func" onclick="clearAll()" style="color: #f28b82;">AC</button>
-
-            <button class="btn btn-func" onclick="append('nCr(')">C(n,k)</button>
-            <button class="btn btn-func" onclick="append('nPr(')">A(n,k)</button>
-            <button class="btn" onclick="append('7')">7</button>
-            <button class="btn" onclick="append('8')">8</button>
-            <button class="btn" onclick="append('9')">9</button>
-
-            <button class="btn btn-func" onclick="append('P_bern(')">Bern</button>
-            <button class="btn btn-func" onclick="append('P_poiss(')">Poiss</button>
-            <button class="btn" onclick="append('4')">4</button>
-            <button class="btn" onclick="append('5')">5</button>
-            <button class="btn" onclick="append('6')">6</button>
-
-            <button class="btn btn-func" onclick="append('C')">÷</button>
-            <button class="btn btn-func" onclick="append('^')">xʸ</button>
-            <button class="btn" onclick="append('1')">1</button>
-            <button class="btn" onclick="append('2')">2</button>
-            <button class="btn" onclick="append('3')">3</button>
-
-            <button class="btn btn-func" onclick="append('*')">×</button>
-            <button class="btn btn-func" onclick="append('-')">-</button>
-            <button class="btn" onclick="append('0')">0</button>
-            <button class="btn" onclick="append('.')">.</button>
-            <button class="btn btn-equals" onclick="calculateSolution()">=</button>
-
-            <button class="btn btn-func" onclick="append('+')">+</button>
-        </div>
-
-        <!-- Раздел с пошаговым решением -->
-        <div id="solutionSection" class="solution-section">
-            <h3>Пошаговое решение:</h3>
-            <div id="stepsList"></div>
-        </div>
+    <!-- Image Upload Area -->
+    <div class="photo-upload-zone" onclick="document.getElementById('photoInput').click()">
+        <span>📷</span>
+        <span class="photo-upload-label">Upload photo of problem / formula</span>
+        <input type="file" id="photoInput" accept="image/*" onchange="processImage(this)">
     </div>
 
-    <script>
-        const inputEl = document.getElementById('calcInput');
-        const exprEl = document.getElementById('expressionDisplay');
-        const solutionSection = document.getElementById('solutionSection');
-        const stepsList = document.getElementById('stepsList');
-        const loadingEl = document.getElementById('loading');
+    <div id="loading" class="loading-spinner">⏳ Scanning and recognizing image text...</div>
 
-        function append(val) {
-            inputEl.value += val;
-        }
+    <!-- Display Screen -->
+    <div class="display-container">
+        <div id="expressionDisplay" class="display-expression"></div>
+        <input type="text" id="calcInput" class="display-input" placeholder="0" autocomplete="off">
+    </div>
 
-        function clearAll() {
-            inputEl.value = '';
-            exprEl.innerText = '';
-            solutionSection.classList.remove('active');
-        }
+    <!-- Calculator Buttons -->
+    <div class="keypad">
+        <button class="btn btn-func" onclick="append('!')">x!</button>
+        <button class="btn btn-func" onclick="append('(')">(</button>
+        <button class="btn btn-func" onclick="append(')')">)</button>
+        <button class="btn btn-func" onclick="append('%')">%</button>
+        <button class="btn btn-func" onclick="clearAll()" style="color: #f28b82;">AC</button>
 
-        // Вспомогательный факториал
-        function fact(n) {
-            if (n < 0) return NaN;
-            if (n === 0 || n === 1) return 1;
-            let r = 1;
-            for (let i = 2; i <= n; i++) r *= i;
-            return r;
-        }
+        <button class="btn btn-func" onclick="append('nCr(')">C(n,k)</button>
+        <button class="btn btn-func" onclick="append('nPr(')">A(n,k)</button>
+        <button class="btn" onclick="append('7')">7</button>
+        <button class="btn" onclick="append('8')">8</button>
+        <button class="btn" onclick="append('9')">9</button>
 
-        // Распознавание фото с Tesseract.js
-        async function processImage(input) {
-            if (!input.files || !input.files[0]) return;
-            const file = input.files[0];
+        <button class="btn btn-func" onclick="append('P_bern(')">Bern</button>
+        <button class="btn btn-func" onclick="append('P_poiss(')">Poiss</button>
+        <button class="btn" onclick="append('4')">4</button>
+        <button class="btn" onclick="append('5')">5</button>
+        <button class="btn" onclick="append('6')">6</button>
 
-            loadingEl.style.display = 'block';
-            solutionSection.classList.remove('active');
+        <button class="btn btn-func" onclick="append('/')">÷</button>
+        <button class="btn btn-func" onclick="append('^')">xʸ</button>
+        <button class="btn" onclick="append('1')">1</button>
+        <button class="btn" onclick="append('2')">2</button>
+        <button class="btn" onclick="append('3')">3</button>
 
-            try {
-                const worker = await Tesseract.createWorker('rus+eng');
-                const ret = await worker.recognize(file);
-                await worker.terminate();
+        <button class="btn btn-func" onclick="append('*')">×</button>
+        <button class="btn btn-func" onclick="append('-')">-</button>
+        <button class="btn" onclick="append('0')">0</button>
+        <button class="btn" onclick="append('.')">.</button>
+        <button class="btn btn-equals" onclick="calculateSolution()">=</button>
 
-                const text = ret.data.text.trim();
-                loadingEl.style.display = 'none';
+        <button class="btn btn-func" onclick="append('+')">+</button>
+    </div>
 
-                if (text) {
-                    // Извлекаем математические выражения или очищаем текст
-                    let cleaned = text.replace(/[^0-01-9\+\-\*\/\^\!\(\)\.\,\s]/g, '').trim();
-                    inputEl.value = cleaned || text;
-                    calculateSolution();
-                } else {
-                    alert('Не удалось распознать текст на фото. Попробуйте более четкое фото.');
-                }
-            } catch (e) {
-                loadingEl.style.display = 'none';
-                alert('Ошибка при сканировании изображения.');
+    <!-- Step-by-step Solution -->
+    <div id="solutionSection" class="solution-section">
+        <h3>Step-by-step Solution:</h3>
+        <div id="stepsList"></div>
+    </div>
+</div>
+
+<script>
+    const inputEl = document.getElementById('calcInput');
+    const exprEl = document.getElementById('expressionDisplay');
+    const solutionSection = document.getElementById('solutionSection');
+    const stepsList = document.getElementById('stepsList');
+    const loadingEl = document.getElementById('loading');
+
+    function append(val) {
+        inputEl.value += val;
+    }
+
+    function clearAll() {
+        inputEl.value = '';
+        exprEl.innerText = '';
+        solutionSection.classList.remove('active');
+    }
+
+    // Helper Factorial Function
+    function fact(n) {
+        if (n < 0) return NaN;
+        if (n === 0 || n === 1) return 1;
+        let r = 1;
+        for (let i = 2; i <= n; i++) r *= i;
+        return r;
+    }
+
+    // Process Image Upload using Tesseract OCR
+    async function processImage(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        
+        loadingEl.style.display = 'block';
+        solutionSection.classList.remove('active');
+
+        try {
+            const worker = await Tesseract.createWorker('eng');
+            const ret = await worker.recognize(file);
+            await worker.terminate();
+
+            const text = ret.data.text.trim();
+            loadingEl.style.display = 'none';
+
+            if (text) {
+                // Filter out non-math characters
+                let cleaned = text.replace(/[^0-9\+\-\*\/\^\!\(\)\.\,\s]/g, '').trim();
+                inputEl.value = cleaned || text;
+                calculateSolution();
+            } else {
+                alert('Could not recognize text from photo. Please try a clearer image.');
             }
+        } catch (e) {
+            loadingEl.style.display = 'none';
+            alert('Error scanning the image.');
         }
+    }
 
-        // Анализ и вычисление
-        function calculateSolution() {
-            const raw = inputEl.value.trim();
-            if (!raw) return;
+    // Calculate Expression and Build Step-by-step Explanations
+    function calculateSolution() {
+        const raw = inputEl.value.trim();
+        if (!raw) return;
 
-            exprEl.innerText = raw + ' =';
-            stepsList.innerHTML = '';
-            let steps = [];
-            let finalAns = null;
+        exprEl.innerText = raw + ' =';
+        stepsList.innerHTML = '';
+        let steps = [];
+        let finalAns = null;
 
-            try {
-                // 1. Проверка Специальных функций: nCr, nPr, Bernoulli, Poisson
-                if (raw.startsWith('nCr(')) {
-                    // Пример: nCr(5, 2)
-                    const params = raw.replace('nCr(', '').replace(')', '').split(',').map(Number);
-                    const n = params[0],
-                        k = params[1];
-                    if (isNaN(n) || isNaN(k) || k > n) throw new Error('Некорректные параметры nCr(n,k)');
+        try {
+            // 1. Combinations: nCr(n, k)
+            if (raw.startsWith('nCr(')) {
+                const params = raw.replace('nCr(', '').replace(')', '').split(',').map(Number);
+                const n = params[0], k = params[1];
+                if (isNaN(n) || isNaN(k) || k > n) throw new Error('Invalid parameters for nCr(n,k)');
 
-                    finalAns = fact(n) / (fact(k) * fact(n - k));
-                    steps.push({
-                        title: '1. Формула сочетаний C(n, k)',
-                        text: `C(${n}, ${k}) = n! / (k! * (n - k)!)`
-                    });
-                    steps.push({
-                        title: '2. Вычисление факториалов',
-                        text: `${n}! = ${fact(n)}, ${k}! = ${fact(k)}, (${n}-${k})! = ${fact(n-k)}`
-                    });
-                    steps.push({
-                        title: '3. Итоговый ответ',
-                        text: `C(${n}, ${k}) = ${fact(n)} / (${fact(k)} * ${fact(n-k)}) = <b>${finalAns}</b>`
-                    });
-                } else if (raw.startsWith('nPr(')) {
-                    // Пример: nPr(5, 2)
-                    const params = raw.replace('nPr(', '').replace(')', '').split(',').map(Number);
-                    const n = params[0],
-                        k = params[1];
-                    if (isNaN(n) || isNaN(k) || k > n) throw new Error('Некорректные параметры nPr(n,k)');
-
-                    finalAns = fact(n) / fact(n - k);
-                    steps.push({
-                        title: '1. Формула размещений A(n, k)',
-                        text: `A(${n}, ${k}) = n! / (n - k)!`
-                    });
-                    steps.push({
-                        title: '2. Итоговый ответ',
-                        text: `A(${n}, ${k}) = ${fact(n)} / ${fact(n-k)} = <b>${finalAns}</b>`
-                    });
-                } else if (raw.startsWith('P_bern(')) {
-                    // Пример: P_bern(n, k, p) -> P_bern(10, 3, 0.5)
-                    const pArr = raw.replace('P_bern(', '').replace(')', '').split(',').map(Number);
-                    const n = pArr[0],
-                        k = pArr[1],
-                        p = pArr[2];
-                    const q = 1 - p;
-                    const cVal = fact(n) / (fact(k) * fact(n - k));
-                    finalAns = cVal * Math.pow(p, k) * Math.pow(q, n - k);
-
-                    steps.push({
-                        title: '1. Формула Бернулли',
-                        text: `P_n(k) = C(n, k) * p^k * (1 - p)^(n - k)`
-                    });
-                    steps.push({
-                        title: '2. Подстановка',
-                        text: `P_${n}(${k}) = ${cVal} * (${p}^${k}) * (${q.toFixed(2)}^${n-k})`
-                    });
-                    steps.push({
-                        title: '3. Ответ',
-                        text: `P = <b>${finalAns.toFixed(6)}</b>`
-                    });
-                } else if (raw.startsWith('P_poiss(')) {
-                    // Пример: P_poiss(lambda, k) -> P_poiss(2.5, 3)
-                    const pArr = raw.replace('P_poiss(', '').replace(')', '').split(',').map(Number);
-                    const l = pArr[0],
-                        k = pArr[1];
-                    finalAns = (Math.pow(l, k) * Math.exp(-l)) / fact(k);
-
-                    steps.push({
-                        title: '1. Формула Пуассона',
-                        text: `P(X = k) = (λ^k * e^-λ) / k!`
-                    });
-                    steps.push({
-                        title: '2. Вычисление',
-                        text: `P(X = ${k}) = (${l}^${k} * e^-${l}) / ${k}!`
-                    });
-                    steps.push({
-                        title: '3. Ответ',
-                        text: `P = <b>${finalAns.toFixed(6)}</b>`
-                    });
-                }
-                // 2. Стандартные арифметические выражения
-                else {
-                    let parsed = raw.replace(/\^/g, '**');
-                    // Замена факториалов вида 5!
-                    parsed = parsed.replace(/(\d+)!/g, (match, num) => fact(parseInt(num)));
-
-                    finalAns = Function(`'use strict'; return (${parsed})`)();
-
-                    steps.push({
-                        title: '1. Исходное выражение',
-                        text: `${raw}`
-                    });
-                    steps.push({
-                        title: '2. Пошаговый расчет',
-                        text: `Результат: <b>${finalAns}</b>`
-                    });
-                }
-
-                inputEl.value = finalAns;
-
-                // Вывод шагов
-                steps.forEach(s => {
-                    const div = document.createElement('div');
-                    div.className = 'step-card';
-                    div.innerHTML = `<div class="step-title">${s.title}</div><div>${s.text}</div>`;
-                    stepsList.appendChild(div);
+                finalAns = fact(n) / (fact(k) * fact(n - k));
+                steps.push({ 
+                    title: '1. Combination Formula', 
+                    text: `<div class="formula-box">C(n, k) = n! / (k! * (n - k)!)</div>` 
                 });
-
-                solutionSection.classList.add('active');
-
-            } catch (e) {
-                alert('Ошибка вычисления. Проверьте правильность введенных данных!');
+                steps.push({ 
+                    title: '2. Factorial Computations', 
+                    text: `${n}! = ${fact(n)}, ${k}! = ${fact(k)}, (${n} - ${k})! = ${fact(n - k)}` 
+                });
+                steps.push({ 
+                    title: '3. Final Evaluation', 
+                    text: `C(${n}, ${k}) = ${fact(n)} / (${fact(k)} * ${fact(n - k)}) = <b>${finalAns}</b>` 
+                });
             }
+            // 2. Permutations: nPr(n, k)
+            else if (raw.startsWith('nPr(')) {
+                const params = raw.replace('nPr(', '').replace(')', '').split(',').map(Number);
+                const n = params[0], k = params[1];
+                if (isNaN(n) || isNaN(k) || k > n) throw new Error('Invalid parameters for nPr(n,k)');
+
+                finalAns = fact(n) / fact(n - k);
+                steps.push({ 
+                    title: '1. Permutation Formula', 
+                    text: `<div class="formula-box">A(n, k) = n! / (n - k)!</div>` 
+                });
+                steps.push({ 
+                    title: '2. Final Evaluation', 
+                    text: `A(${n}, ${k}) = ${fact(n)} / ${fact(n - k)} = <b>${finalAns}</b>` 
+                });
+            }
+            // 3. Bernoulli Trial: P_bern(n, k, p)
+            else if (raw.startsWith('P_bern(')) {
+                const pArr = raw.replace('P_bern(', '').replace(')', '').split(',').map(Number);
+                const n = pArr[0], k = pArr[1], p = pArr[2];
+                if (isNaN(n) || isNaN(k) || isNaN(p) || p < 0 || p > 1 || k > n) throw new Error('Invalid Bernoulli parameters');
+
+                const q = 1 - p;
+                const cVal = fact(n) / (fact(k) * fact(n - k));
+                finalAns = cVal * Math.pow(p, k) * Math.pow(q, n - k);
+
+                steps.push({ 
+                    title: '1. Bernoulli Formula', 
+                    text: `<div class="formula-box">P_n(k) = C(n, k) * p^k * (1 - p)^(n - k)</div>` 
+                });
+                steps.push({ 
+                    title: '2. Complementary Probability (q)', 
+                    text: `q = 1 - p = 1 - ${p} = ${q.toFixed(4)}` 
+                });
+                steps.push({ 
+                    title: '3. Substitution & Calculation', 
+                    text: `P_${n}(${k}) = ${cVal} * (${p}^${k}) * (${q.toFixed(4)}^${n - k})` 
+                });
+                steps.push({ 
+                    title: '4. Final Result', 
+                    text: `P = <b>${finalAns.toFixed(6)}</b>` 
+                });
+            }
+            // 4. Poisson Distribution: P_poiss(lambda, k)
+            else if (raw.startsWith('P_poiss(')) {
+                const pArr = raw.replace('P_poiss(', '').replace(')', '').split(',').map(Number);
+                const l = pArr[0], k = pArr[1];
+                if (isNaN(l) || isNaN(k) || l < 0 || k < 0) throw new Error('Invalid Poisson parameters');
+
+                finalAns = (Math.pow(l, k) * Math.exp(-l)) / fact(k);
+
+                steps.push({ 
+                    title: '1. Poisson Distribution Formula', 
+                    text: `<div class="formula-box">P(X = k) = (λ^k * e^-λ) / k!</div>` 
+                });
+                steps.push({ 
+                    title: '2. Substitution', 
+                    text: `P(X = ${k}) = (${l}^${k} * e^-${l}) / ${k}!` 
+                });
+                steps.push({ 
+                    title: '3. Final Result', 
+                    text: `P = <b>${finalAns.toFixed(6)}</b>` 
+                });
+            }
+            // 5. Standard Arithmetic Expressions
+            else {
+                let parsed = raw.replace(/\^/g, '**');
+                // Handle Factorials (e.g. 5!)
+                parsed = parsed.replace(/(\d+)!/g, (match, num) => fact(parseInt(num)));
+                
+                finalAns = Function(`'use strict'; return (${parsed})`)();
+                
+                steps.push({ 
+                    title: '1. Input Expression', 
+                    text: `<div class="formula-box">${raw}</div>` 
+                });
+                steps.push({ 
+                    title: '2. Calculated Result', 
+                    text: `Result: <b>${finalAns}</b>` 
+                });
+            }
+
+            inputEl.value = finalAns;
+
+            // Render Solution Steps
+            steps.forEach(s => {
+                const div = document.createElement('div');
+                div.className = 'step-card';
+                div.innerHTML = `<div class="step-title">${s.title}</div><div>${s.text}</div>`;
+                stepsList.appendChild(div);
+            });
+
+            solutionSection.classList.add('active');
+
+        } catch (e) {
+            alert('Calculation error. Please check your syntax!');
         }
-    </script>
+    }
+</script>
 
 </body>
-
 </html>
